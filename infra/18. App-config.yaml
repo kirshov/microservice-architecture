@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: app-env
+data:
+  .env.local: |
+    APP_ENV=prod
+    APP_SECRET=dd5d1f1d3126606ba31a2336c21b12c5

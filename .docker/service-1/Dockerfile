@@ -6,5 +6,4 @@ RUN wget https://getcomposer.org/installer -O - -q | php -- --install-dir=/bin -
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 COPY ./app /app
-
 WORKDIR /app

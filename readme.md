@@ -1,7 +1,8 @@
-### Домашнее задание к лекции 10 "Основы работы с Docker"
+### Домашнее задание
 
-- Докер файлы, при помощи которых собиарл образы находятся в директории .docker
-- Собрал 2 образа
-  - Http сервер: https://hub.docker.com/r/kirshov/ma-nginx
-  - Сервис: https://hub.docker.com/r/kirshov/service-1
-  - Запускаю все через docker-compose, в конфигурации прописал ссылки на образы на docker.hub
+Команда развертывания `kubectl apply -f ./infra/`
+
+Команда удаления `kubectl delete -f ./infra/`
+
+
+[Ссылка на коллекцию Postman](https://api.postman.com/collections/25030056-95baae54-f656-4982-9b04-74b4f8ebb3f6?access_key=PMAT-01HR7T1X626SYX2ED4BTFV4E4F)

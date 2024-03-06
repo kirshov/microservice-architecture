@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: kirshov/service-1
+          ports:
+            - name: app-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          volumeMounts:
+            - name: app-env
+              mountPath: '/app/.env.local'
+              subPath: '.env.local'
+            - name: cache-volume
+              mountPath: '/app/var/'
+          lifecycle:
+            postStart:
+              exec:
+                command: [ '/bin/sh', '-c', 'chown -R www-data:www-data /app/var' ]
+
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - name: nginx-port
+              containerPort: 80
+          volumeMounts:
+            - name: app-nginx-config
+              mountPath: '/etc/nginx/conf.d'
+
+      volumes:
+        - name: app-nginx-config
+          configMap:
+            name: app-nginx-config
+        - name: app-env
+          configMap:
+            name: app-env
+        - name: cache-volume
+          emptyDir: {}

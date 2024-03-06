@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HealthCheckController
 {
-    #[Route('/healthcheck/', name: 'healthcheck')]
+    #[Route('/health', name: 'healthcheck')]
     public function healthcheck(): Response
     {
         $response = ['status' => 'OK'];
