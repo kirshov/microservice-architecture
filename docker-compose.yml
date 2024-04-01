@@ -8,13 +8,31 @@ services:
     container_name: s-nginx
     restart: always
     ports:
-      - "8000:80"
+      - "80:80"
     depends_on:
       - service-1
 
   service-1:
-    image: kirshov/service-1
+    #image: kirshov/service-1
+    build:
+      context: ./.docker/service-1
     container_name: service-1
     volumes:
       - ./app:/app
+      - ./app/config:/app/config
       - ./app/var/cache:/app/var/cache
+  service-1-postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: 'service_1'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '!ChangeMe!'
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+    ports:
+      - "5432:5432"
+    container_name: service-1-postgres
+
+volumes:
+  db-data:

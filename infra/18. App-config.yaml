@@ -6,3 +6,4 @@ data:
   .env.local: |
     APP_ENV=prod
     APP_SECRET=dd5d1f1d3126606ba31a2336c21b12c5
+    DATABASE_URL="postgresql://postgres:!ChangeMe!@service-1-postgres:5432/service_1?serverVersion=15&charset=utf8"
