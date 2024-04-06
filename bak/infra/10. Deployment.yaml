@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: app
@@ -18,12 +18,12 @@ spec:
           ports:
             - name: app-port
               containerPort: 8000
-          #livenessProbe:
-          #  httpGet:
-          #    path: /health
-          #    port: 80
-          #  initialDelaySeconds: 3
-          #  periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
           volumeMounts:
             - name: app-env
               mountPath: '/app/.env.local'
@@ -44,17 +44,6 @@ spec:
             - name: app-nginx-config
               mountPath: '/etc/nginx/conf.d'
 
-        #- name: postgres
-        #  image: postgres:15
-        #  ports:
-        #    - containerPort: 5432
-        #  envFrom:
-        #    - configMapRef:
-        #        name: postgres-secret
-        #  volumeMounts:
-        #    - mountPath: /var/lib/postgresql/data
-        #      name: postgresdata
-
       volumes:
         - name: app-nginx-config
           configMap:
@@ -64,6 +53,3 @@ spec:
             name: app-env
         - name: cache-volume
           emptyDir: {}
-        - name: postgresdata
-          persistentVolumeClaim:
-            claimName: postgres-volume-claim

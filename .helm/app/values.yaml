@@ -1,0 +1,125 @@
+appName: app
+
+app:
+  env: prod
+  secret: dd5d1f1d3126606ba31a2336c21b12c5
+  dbUrl: postgresql://postgres:postgres_pass@app-postgres-postgresql.m.svc.cluster.local:5432/service_1?serverVersion=16&charset=utf8
+
+replicaCount: 1
+
+serviceNginx:
+  name: nginx
+  image: nginx:latest
+  volumeMounts:
+    - name: app-nginx-config
+      mountPath: '/etc/nginx/conf.d'
+  portNumber: 80
+  portName: nginx-port
+
+serviceMainApp:
+  image: kirshov/service-1
+  port:
+    name: app-port
+    containerPort: 8000
+  volumeMounts:
+    - name: app-env
+      mountPath: '/app/.env.local'
+      subPath: '.env.local'
+    - name: cache-volume
+      mountPath: '/app/var/'
+  lifecycle:
+    postStart:
+      exec:
+        command: [ '/bin/sh', '-c', 'chown -R www-data:www-data /app/var' ]
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 80
+  initialDelaySeconds: 3
+  periodSeconds: 3
+
+migrationJob:
+  name: schema-migration-job
+  containers:
+    - name: schema-update
+      image: kirshov/service-1
+      command: [ '/bin/sh', '-c', '/app/bin/console doctrine:migrations:migrate --no-interaction' ]
+      volumeMounts:
+        - name: app-env
+          mountPath: '/app/.env.local'
+          subPath: '.env.local'
+  restartPolicy: Never
+  volumes:
+    - name: app-env
+      configMap:
+        name: app-env
+  backoffLimit: 1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  name: "service"
+
+ingress:
+  name: "ingress-nginx"
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes:
+  - name: app-nginx-config
+    configMap:
+      name: app-nginx-config
+  - name: app-env
+    configMap:
+      name: app-env
+  - name: cache-volume
+    emptyDir: { }
+
+secrets:
+  postgresSecret: app-postgres-secret
+
+configMaps:
+  nginxConfigMap: app-nginx-config
+  appConfigMap: app-env
