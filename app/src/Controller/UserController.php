@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
-use App\Model\User\Entity\User\Email;
+use App\Model\User\Entity\User\User;
 use App\Model\User\Entity\UserRepository;
 use App\Model\User\UseCase\Create\Command;
 use App\Model\User\UseCase\Create\Handler;
+use App\Model\User\UseCase\Delete\Command as DeleteCommand;
+use App\Model\User\UseCase\Delete\Handler as DeleteHandler;
 use App\Model\User\UseCase\Update\Command as UpdateCommand;
 use App\Model\User\UseCase\Update\Handler as UpdateHandler;
 use RuntimeException;
@@ -28,11 +30,9 @@ class UserController
             $command->name = $requestArray['name'];
             $command->email = $requestArray['email'];
 
-            $userId = $handler->handle($command);
+			$user = $handler->handle($command);
 
-            $response = [
-                'id' => $userId,
-            ];
+			$response = $this->getUserDataResponse($user);
         } catch (Throwable $e) {
             $response = [
                 'error' => $e->getMessage(),
@@ -42,21 +42,20 @@ class UserController
         return new JsonResponse($response);
     }
 
-    #[Route('/update', name: 'update', methods: ['POST'])]
+    #[Route('/update', name: 'update', methods: ['PUT'])]
     public function update(Request $request, UpdateHandler $handler): Response
     {
         try {
             $requestArray = json_decode($request->getContent(), true);
 
             $command = new UpdateCommand();
+            $command->id = (int) $request->get('id');
             $command->name = $requestArray['name'];
-            $command->email = $request->get('email');
+            $command->email = $requestArray['email'];
 
-            $handler->handle($command);
+            $user = $handler->handle($command);
 
-            $response = [
-                'success' => true,
-            ];
+			$response = $this->getUserDataResponse($user);
         } catch (Throwable $e) {
             $response = [
                 'error' => $e->getMessage(),
@@ -70,20 +69,15 @@ class UserController
     public function get(Request $request, UserRepository $userRepository): Response
     {
         try {
-            $email = new Email($request->get('email'));
+            $id = (int) $request->get('id');
 
-            $user = $userRepository->findByEmail($email);
+            $user = $userRepository->findById($id);
 
             if (null === $user) {
                 throw new RuntimeException('User not found');
             }
 
-            $response = [
-                'id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'name' => $user->getName(),
-                'status' => $user->getStatus(),
-            ];
+            $response = $this->getUserDataResponse($user);
         } catch (Throwable $e) {
             $response = [
                 'error' => $e->getMessage(),
@@ -92,4 +86,39 @@ class UserController
 
         return new JsonResponse($response);
     }
+
+	#[Route('/delete', name: 'delete', methods: ['DELETE'])]
+	public function delete(Request $request, DeleteHandler $handler): Response
+	{
+		try {
+			$command = new DeleteCommand();
+			$command->id = (int) $request->get('id');
+
+			$handler->handle($command);
+
+			$response = [
+				'id' => $command->id,
+			];
+		} catch (Throwable $e) {
+			$response = [
+				'error' => $e->getMessage(),
+			];
+		}
+
+		return new JsonResponse($response);
+	}
+
+	/**
+	 * @param User $user
+	 * @return array
+	 */
+	private function getUserDataResponse(User $user): array
+	{
+		return [
+			'id' => $user->getId(),
+			'email' => $user->getEmail(),
+			'name' => $user->getName(),
+			'status' => $user->getStatus(),
+		];
+	}
 }

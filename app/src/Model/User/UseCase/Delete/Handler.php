@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Model\User\UseCase\Update;
+namespace App\Model\User\UseCase\Delete;
 
-use App\Model\User\Entity\User\User;
 use App\Model\User\Entity\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
@@ -24,7 +23,7 @@ class Handler
 	/**
 	 * @param Command $command
 	 */
-	public function handle(Command $command): User
+	public function handle(Command $command): void
 	{
         $user = $this->userRepository->findById($command->id);
 
@@ -32,11 +31,8 @@ class Handler
 			throw new DomainException('User is not found');
 		}
 
-        $user->setName($command->name);
-        $user->setEmail($command->email);
+		$this->em->remove($user);
 
 		$this->em->flush();
-
-		return $user;
 	}
 }

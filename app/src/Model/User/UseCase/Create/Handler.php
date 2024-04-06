@@ -25,7 +25,7 @@ class Handler
      * @param Command $command
      * @return int|null
      */
-	public function handle(Command $command): ?int
+	public function handle(Command $command): User
 	{
 		$email = new Email($command->email);
 
@@ -41,6 +41,6 @@ class Handler
         $this->userRepository->add($user);
         $this->entityManager->flush();
 
-        return $user->getId();
+        return $user;
 	}
 }
