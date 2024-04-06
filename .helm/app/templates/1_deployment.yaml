@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+        - name: {{ .Values.appName }}
+          image: {{ .Values.serviceMainApp.image }}
+          ports:
+            - name: {{ .Values.serviceMainApp.port.name }}
+              containerPort: {{ .Values.serviceMainApp.port.containerPort }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          volumeMounts:
+            {{- toYaml .Values.serviceMainApp.volumeMounts | nindent 12 }}
+          lifecycle:
+            {{- toYaml .Values.serviceMainApp.lifecycle | nindent 12 }}
+
+        - name: {{ .Values.serviceNginx.name }}
+          image: {{ .Values.serviceNginx.image }}
+          ports:
+            - name: {{ .Values.serviceNginx.portName }}
+              containerPort: {{ .Values.serviceNginx.portNumber }}
+          volumeMounts:
+            {{- toYaml .Values.serviceNginx.volumeMounts | nindent 12 }}
+      volumes:
+        {{- toYaml .Values.volumes | nindent 12 }}

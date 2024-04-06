@@ -1,3 +1,4 @@
+#Dockerfile для docker-compose
 ARG PHP_BASEIMAGE_VERSION=8.2
 FROM php:${PHP_BASEIMAGE_VERSION}-fpm
 
@@ -6,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     zlib1g-dev \
     libmcrypt-dev \
-    libzip-dev
+    libzip-dev \
+    nano
 
 RUN docker-php-ext-install pdo pdo_pgsql
 
@@ -14,5 +16,4 @@ RUN wget https://getcomposer.org/installer -O - -q | php -- --install-dir=/bin -
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-COPY ./app /app
 WORKDIR /app

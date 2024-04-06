@@ -30,7 +30,7 @@ serviceMainApp:
   lifecycle:
     postStart:
       exec:
-        command: [ '/bin/sh', '-c', 'chown -R www-data:www-data /app/var' ]
+        command: [ '/bin/sh', '-c', 'chown -R www-data:www-data /app/var']
 
 livenessProbe:
   httpGet:
@@ -44,7 +44,7 @@ migrationJob:
   containers:
     - name: schema-update
       image: kirshov/service-1
-      command: [ '/bin/sh', '-c', '/app/bin/console doctrine:migrations:migrate --no-interaction' ]
+      command: [ '/bin/sh', '-c', 'chmod -x /app/bin/console', '/app/bin/console doctrine:migrations:migrate --no-interaction' ]
       volumeMounts:
         - name: app-env
           mountPath: '/app/.env.local'
