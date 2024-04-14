@@ -13,7 +13,6 @@ services:
       - service-1
 
   service-1:
-    #image: kirshov/service-1
     build:
       context: ./.docker/service-1
     container_name: service-1
@@ -21,6 +20,7 @@ services:
       - ./app:/app
       - ./app/config:/app/config
       - ./app/var/cache:/app/var/cache
+
   service-1-postgres:
     image: postgres:15-alpine
     restart: always

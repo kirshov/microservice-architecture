@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.appName }}
-          image: {{ .Values.serviceMainApp.image }}
+          image: "{{ .Values.serviceMainApp.image }}:{{ .Values.serviceMainApp.tag }}"
           ports:
             - name: {{ .Values.serviceMainApp.port.name }}
               containerPort: {{ .Values.serviceMainApp.port.containerPort }}

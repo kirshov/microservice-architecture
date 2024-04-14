@@ -8,8 +8,15 @@ spec:
   template:
     spec:
       containers:
-        {{- toYaml .Values.migrationJob.containers | nindent 12 }}
+        - name: {{ .Values.migrationJob.containerName | quote }}
+          image: "{{ .Values.serviceMainApp.image }}:{{ .Values.serviceMainApp.tag }}"
+          command:
+            {{- range .Values.migrationJob.command }}
+              - {{ . | quote}}
+            {{ end }}
+          volumeMounts:
+            {{- toYaml .Values.migrationJob.volumeMounts | nindent 12 }}
       restartPolicy: {{ .Values.migrationJob.restartPolicy }}
       volumes:
-        {{- toYaml .Values.migrationJob.volumes | nindent 12 }}
+        {{- toYaml .Values.migrationJob.volumes | nindent 8 }}
   backoffLimit: {{ .Values.migrationJob.backoffLimit }}
