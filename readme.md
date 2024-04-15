@@ -14,6 +14,8 @@ helm repo update
 helm upgrade --install nginx ingress-nginx/ingress-nginx --namespace=m -f "./.helm/nginx-ingress/values.yaml"
 
 # Установить postgres
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+
 helm upgrade --install app-postgres oci://registry-1.docker.io/bitnamicharts/postgresql --namespace=m -f  "./.helm/postgres/values.yaml"
 
 # Запустить приложение

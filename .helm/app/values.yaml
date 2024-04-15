@@ -5,7 +5,7 @@ app:
   secret: dd5d1f1d3126606ba31a2336c21b12c5
   dbUrl: postgresql://postgres:postgres_pass@app-postgres-postgresql.m.svc.cluster.local:5432/service_1?serverVersion=16&charset=utf8
 
-replicaCount: 1
+replicaCount: 3
 
 serviceNginx:
   name: nginx
@@ -44,7 +44,7 @@ migrationJob:
   containers:
     - name: schema-update
       image: kirshov/service-1
-      command: [ '/bin/sh', '-c', 'chmod -x /app/bin/console', '/app/bin/console doctrine:migrations:migrate --no-interaction' ]
+      command: [ '/bin/sh', '-c', 'php /app/bin/console doctrine:migrations:migrate --no-interaction' ]
       volumeMounts:
         - name: app-env
           mountPath: '/app/.env.local'
@@ -54,7 +54,7 @@ migrationJob:
     - name: app-env
       configMap:
         name: app-env
-  backoffLimit: 1
+  backoffLimit: 4
 
 imagePullSecrets: []
 nameOverride: ""
