@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "{{ .Values.appName }}-{{ .Values.service.name }}"
+  labels:
+    app: "{{ .Values.appName }}-{{ .Values.service.name }}"
 spec:
   type: ClusterIP
   selector:
@@ -10,6 +12,7 @@ spec:
     - protocol: TCP
       port: {{ .Values.serviceNginx.portNumber }}
       targetPort: {{ .Values.serviceNginx.portName }}
+      name: {{ .Values.service.portName }}
 
 ---
 apiVersion: v1

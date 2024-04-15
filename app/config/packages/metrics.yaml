@@ -3,7 +3,7 @@ artprima_prometheus_metrics:
   namespace: app
 
   # ignoring some routes in metrics
-  ignored_routes: [ healthcheck, prometheus_bundle_prometheus ]
+  ignored_routes: [ healthcheck, metrics, prometheus_bundle_prometheus ]
 
   # metrics backend
   storage:

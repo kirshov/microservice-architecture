@@ -8,8 +8,8 @@ spec:
   jobLabel: {{ include "app.fullname" . }}
   selector:
     matchLabels:
-      {{- include "app.selectorLabels" . | nindent 6 }}
+      app: "{{ .Values.appName }}-{{ .Values.service.name }}"
   endpoints:
-    - interval: 2s
-      port: nginx-port
+    - interval: 15s
+      port: {{ .Values.service.portName }}
       path: /metrics

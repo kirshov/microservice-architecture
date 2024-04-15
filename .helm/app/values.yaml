@@ -42,22 +42,20 @@ livenessProbe:
 
 migrationJob:
   name: schema-migration-job
-  containerName: schema-update
-  command:
-    - "/bin/sh"
-    - "-c"
-    - "chmod -x /app/bin/console"
-    - "/app/bin/console doctrine:migrations:migrate --no-interaction"
-  volumeMounts:
-    - name: app-env
-      mountPath: '/app/.env.local'
-      subPath: '.env.local'
+  containers:
+    - name: schema-update
+      image: kirshov/service-1
+      command: [ '/bin/sh', '-c', 'php /app/bin/console doctrine:migrations:migrate --no-interaction' ]
+      volumeMounts:
+        - name: app-env
+          mountPath: '/app/.env.local'
+          subPath: '.env.local'
   restartPolicy: Never
   volumes:
     - name: app-env
       configMap:
         name: app-env
-  backoffLimit: 1
+  backoffLimit: 4
 
 imagePullSecrets: []
 nameOverride: ""
@@ -78,6 +76,7 @@ service:
   type: ClusterIP
   port: 80
   name: "service"
+  portName: "web"
 
 ingress:
   name: "ingress-nginx"
@@ -92,7 +91,7 @@ ingress:
   tls: []
 
 metricsService:
-  name: metrics
+  name: app-metrics
   portName: metrics
   port: 8090
 
