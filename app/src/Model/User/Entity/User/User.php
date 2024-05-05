@@ -5,6 +5,7 @@ namespace App\Model\User\Entity\User;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users', uniqueConstraints: [
@@ -34,9 +35,12 @@ class User
     #[ORM\Column(type: 'smallint')]
 	private ?int $status;
 
+	#[ORM\Column(type: "string")]
+	private ?string $password = null;
+
 	/**
 	 * User constructor.
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function __construct()
 	{
@@ -115,5 +119,23 @@ class User
 	public function isActive(): bool
 	{
 		return $this->status === self::STATUS_ACTIVE;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPassword(): string
+	{
+		return $this->password;
+	}
+
+	/**
+	 * @param string $password
+	 * @return User
+	 */
+	public function setPassword(string $password): self
+	{
+		$this->password = $password;
+		return $this;
 	}
 }

@@ -1,31 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.appName }}
+  name: {{ .Values.authService.name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.appName }}
+      app: {{ .Values.authService.name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.appName }}
-        date: "{{ now | unixEpoch }}"
+        app: {{ .Values.authService.name }}
     spec:
       containers:
-        - name: {{ .Values.appName }}
-          image: {{ .Values.serviceMainApp.image }}
+        - name: {{ .Values.authService.name }}
+          image: {{ .Values.authService.image }}
           imagePullPolicy: Always
           ports:
-            - name: {{ .Values.serviceMainApp.port.name }}
-              containerPort: {{ .Values.serviceMainApp.port.containerPort }}
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
-          volumeMounts:
-            {{- toYaml .Values.serviceMainApp.volumeMounts | nindent 12 }}
-          lifecycle:
-            {{- toYaml .Values.serviceMainApp.lifecycle | nindent 12 }}
+            - name: {{ .Values.authService.port.name }}
+              containerPort: {{ .Values.authService.port.containerPort }}
+          envFrom:
+            {{- toYaml .Values.authService.envFrom | nindent 12 }}
 
         - name: {{ .Values.serviceNginx.name }}
           image: {{ .Values.serviceNginx.image }}

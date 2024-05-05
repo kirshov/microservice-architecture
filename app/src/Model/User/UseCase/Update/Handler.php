@@ -32,8 +32,13 @@ class Handler
 			throw new DomainException('User is not found');
 		}
 
-        $user->setName($command->name);
-        $user->setEmail($command->email);
+		if (!empty($command->name)) {
+			$user->setName($command->name);
+		}
+
+		if (!empty($command->email)) {
+			$user->setEmail($command->email);
+		}
 
 		$this->em->flush();
 

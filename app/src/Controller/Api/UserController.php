@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\Model\User\Entity\User\User;
 use App\Model\User\Entity\UserRepository;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
-#[Route('/user', name: 'user_')]
+#[Route('/api/user', name: 'api_user_')]
 class UserController
 {
     #[Route('/create', name: 'create', methods: ['POST'])]
@@ -50,8 +50,13 @@ class UserController
 
             $command = new UpdateCommand();
             $command->id = (int) $request->get('id');
-            $command->name = $requestArray['name'];
-            $command->email = $requestArray['email'];
+			if (isset($requestArray['name'])) {
+				$command->name = $requestArray['name'];
+			}
+
+			if (isset($requestArray['email'])) {
+				$command->email = $requestArray['email'];
+			}
 
             $user = $handler->handle($command);
 

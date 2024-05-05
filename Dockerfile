@@ -20,6 +20,6 @@ RUN wget https://getcomposer.org/installer -O - -q | php -- --install-dir=/bin -
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 COPY ./app /app
-COPY .docker/service-1/custom-php.ini /usr/local/etc/php/conf.d/custom-php.ini
+COPY .docker/users-service/custom-php.ini /usr/local/etc/php/conf.d/custom-php.ini
 
 WORKDIR /app

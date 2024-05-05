@@ -11,4 +11,4 @@ global:
       postgresPassword: "postgres_pass"
       username: "postgres"
       password: "postgres_pass"
-      database: "service_1"
+      database: "users"

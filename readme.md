@@ -1,14 +1,12 @@
 ## Домашнее задание
 
-[Ссылка на коллекцию Postman](https://api.postman.com/collections/25030056-95baae54-f656-4982-9b04-74b4f8ebb3f6?access_key=PMAT-01HR7T1X626SYX2ED4BTFV4E4F)
-
 ### Запустить minikube
 minikube start
 
-### Запустить тунель
+### Запустить туннель
 minikube tunnel
 
-### Установить prometheus
+### Установить prometheus (ДЛЯ ЭТОГО ДЗ НЕ ТРЕБУЕТСЯ)
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -f "./.helm/prometheus/values.yaml"
@@ -18,7 +16,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/
 helm repo update
 helm upgrade --install nginx ingress-nginx/ingress-nginx -f "./.helm/nginx-ingress/values.yaml"
 
-# Установить postgres
+### Установить postgres
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
 
 helm upgrade --install app-postgres oci://registry-1.docker.io/bitnamicharts/postgresql -f  "./.helm/postgres/values.yaml"
@@ -26,25 +24,19 @@ helm upgrade --install app-postgres oci://registry-1.docker.io/bitnamicharts/pos
 ### Запустить приложение
 helm upgrade --install app ./.helm/app
 
+### Запустить сервис авторизации
+helm upgrade --install app-auth ./.helm/app-auth
+
+### Сценарий взаимодействия
+![screen](screenshot/auth-schema.png)
+
+### Запуск тестов newman
+newman run ./postman/collection.json --folder "test auth"
+![screen](screenshot/lesson-21.png)
+
 ### Удалить приложение
 helm upgrade --uninstall app
 
 ### Удалить postgres
 helm uninstall app-postgres
-
-### Опционально:
-#### Пробросить порт prometheus
-kubectl port-forward service/prometheus-operated 9090
-#### Пробросить порт grafana
-kubectl port-forward service/prometheus-grafana 3000:80
-Доступ к grafana admin/prom-operator
-
-### Удалить prometheus
-helm uninstall prometheus
-
-### Метики
-[JSON метрик приложения](grafana/app-dashboard.json)
-![screen](screenshot/grafana-dashboard-app.png)
-
-[JSON метрик Ingress Controller](grafana/ingress-dashboard.json)
-![screen](screenshot/grafana-dashboard-ingress.png)
+kubectl delete -n default persistentvolumeclaim data-app-postgres-postgresql-0

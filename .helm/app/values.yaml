@@ -3,9 +3,9 @@ appName: app
 app:
   env: prod
   secret: dd5d1f1d3126606ba31a2336c21b12c5
-  dbUrl: postgresql://postgres:postgres_pass@app-postgres-postgresql.default.svc.cluster.local:5432/service_1?serverVersion=16&charset=utf8
+  dbUrl: postgresql://postgres:postgres_pass@app-postgres-postgresql.default.svc.cluster.local:5432/users?serverVersion=16&charset=utf8
 
-replicaCount: 3
+replicaCount: 1
 
 serviceNginx:
   name: nginx
@@ -17,8 +17,7 @@ serviceNginx:
   portName: nginx-port
 
 serviceMainApp:
-  image: kirshov/service-1
-  tag: v2
+  image: kirshov/users-service:latest
   port:
     name: app-port
     containerPort: 8000
@@ -44,7 +43,7 @@ migrationJob:
   name: schema-migration-job
   containers:
     - name: schema-update
-      image: kirshov/service-1
+      image: kirshov/users-service:latest
       command: [ '/bin/sh', '-c', 'php /app/bin/console doctrine:migrations:migrate --no-interaction' ]
       volumeMounts:
         - name: app-env
@@ -82,12 +81,21 @@ ingress:
   name: "ingress-nginx"
   enabled: false
   className: "nginx"
-  annotations: {}
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "http://service-auth.default.svc.cluster.local/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "http://service-auth.default.svc.cluster.local/signin"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-User,X-Email,X-UserId,X-First-Name,X-Last-Name"
   hosts:
     - host: arch.homework
       paths:
         - path: /
           pathType: Prefix
+          serviceName: service
+          servicePort: web
+        #- path: /auth
+        #  pathType: Prefix
+        #  serviceName: service-auth
+        #  servicePort: auth-web
   tls: []
 
 metricsService:

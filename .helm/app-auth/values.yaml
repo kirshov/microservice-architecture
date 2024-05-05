@@ -1,0 +1,72 @@
+appName: app-auth
+
+app:
+  dbHost: app-postgres-postgresql.default.svc.cluster.local
+  dbUser: postgres
+  dbPass: postgres_pass
+  dbName: users
+
+replicaCount: 1
+
+authService:
+  name: app-auth
+  image: kirshov/auth-service:latest
+  port:
+    name: app-auth-port
+    containerPort: 8001
+  envFrom:
+    - configMapRef:
+        name: auth-app-env
+
+serviceNginx:
+  name: nginx
+  image: nginx:latest
+  volumeMounts:
+    - name: app-auth-nginx-config
+      mountPath: '/etc/nginx/conf.d'
+  portNumber: 80
+  portName: nginx-auth-port
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  name: service-auth
+  portName: "auth-web"
+
+ingress:
+  name: ingress-auth
+  enabled: false
+  className: "nginx"
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /login
+          pathType: Prefix
+        - path: /signin
+          pathType: Prefix
+        - path: /logout
+          pathType: Prefix
+        - path: /auth
+          pathType: Prefix
+  tls: []
+
+resources: {}
+
+volumes:
+  - name: app-auth-nginx-config
+    configMap:
+      name: app-auth-nginx-config
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+configMaps:
+  nginxAuthConfigMap: app-auth-nginx-config
+  authConfigMap: auth-app-env

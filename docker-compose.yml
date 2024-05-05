@@ -2,37 +2,51 @@ version: '3'
 
 services:
   nginx:
-    image: kirshov/ma-nginx
-    volumes:
-      - ./:/app
-    container_name: s-nginx
+    build:
+      context: ./.docker/nginx
+    container_name: nginx
     restart: always
     ports:
       - "80:80"
+      - "81:81"
     depends_on:
-      - service-1
+      - users-service
+      - app-auth
 
-  service-1:
+  users-service:
     build:
-      context: ./.docker/service-1
-    container_name: service-1
+      context: ./.docker/users-service
+    container_name: users-service
     volumes:
       - ./app:/app
       - ./app/config:/app/config
       - ./app/var/cache:/app/var/cache
 
-  service-1-postgres:
+  app-auth:
+    build:
+      context: ./.docker/app-auth
+    container_name: app-auth
+    environment:
+      POSTGRES_HOST: 'service-postgres'
+      POSTGRES_DB: 'users'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres_pass'
+    volumes:
+      - ./app-auth:/app-auth
+
+  service-postgres:
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_DB: 'service_1'
+      POSTGRES_HOST: 'postgres'
+      POSTGRES_DB: 'users'
       POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: '!ChangeMe!'
+      POSTGRES_PASSWORD: 'postgres_pass'
     volumes:
       - db-data:/var/lib/postgresql/data:rw
     ports:
       - "5432:5432"
-    container_name: service-1-postgres
+    container_name: service-postgres
 
 volumes:
   db-data:
