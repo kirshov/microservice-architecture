@@ -27,6 +27,9 @@ helm upgrade --install app ./.helm/app
 ### Запустить сервис авторизации
 helm upgrade --install app-auth ./.helm/app-auth
 
+### Запустить сервис биллинга
+helm upgrade --install app-billing ./.helm/app-billing
+
 ### Сценарий взаимодействия
 ![screen](screenshot/auth-schema.png)
 

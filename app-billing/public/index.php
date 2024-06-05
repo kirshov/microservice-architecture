@@ -88,7 +88,7 @@ $app->post('/incoming', function (Request $request, Response $response): Respons
 	try {
 		$operation = new OperationDTO(
 			App\Enum\OperationTypeEnum::INCOMING,
-			UserStorage::getUserId(),
+			$params['userId'],
 			$params['value'] ?? 0
 		);
 
