@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.sendCronJob.name }}
+spec:
+  schedule: '* * * * *'
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            {{- toYaml .Values.sendCronJob.containers | nindent 12 }}
+          restartPolicy: {{ .Values.sendCronJob.restartPolicy }}
+          volumes:
+            {{- toYaml .Values.sendCronJob.volumes | nindent 12 }}

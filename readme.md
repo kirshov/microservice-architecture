@@ -30,6 +30,9 @@ helm upgrade --install app-auth ./.helm/app-auth
 ### Запустить сервис биллинга
 helm upgrade --install app-billing ./.helm/app-billing
 
+### Запустить сервис нотификаций
+helm upgrade --install app-notify ./.helm/app-notify
+
 ### Сценарий взаимодействия
 ![screen](screenshot/auth-schema.png)
 

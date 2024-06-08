@@ -31,8 +31,11 @@ migrationJob:
   name: billing-schema-migration-job
   containers:
     - name: billing-schema-update
-      image: kirshov/users-service:latest
-      command: [ '/bin/sh', '-c', 'ls -l  ./', 'cat ./vendor/bin/phoenix', 'chmod -x ./vendor/bin/phoenix', 'php ./vendor/bin/phoenix migrate --config=./src/config/pheonix.php' ]
+      image: kirshov/billing-service:latest
+      command: [ '/bin/sh', '-c', 'php ./vendor/bin/phoenix migrate --config=./src/config/pheonix.php' ]
+      envFrom:
+        - configMapRef:
+            name: billing-app-env
   restartPolicy: Never
   backoffLimit: 4
 

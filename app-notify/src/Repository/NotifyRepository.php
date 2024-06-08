@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Enum\DbOrderEnum;
 use App\Enum\StatusEnum;
 use PDO;
 
@@ -31,15 +32,45 @@ class NotifyRepository
 		return (int)$this->db->lastInsertId() ?: null;
 	}
 
-	public function getItems(int $limit = 10): array
+	public function getNotSendItems(int $limit = 10): array
 	{
-		$query = 'SELECT id 
+		$query = 'SELECT * 
 			FROM ' . self::TABLE. ' 
 			WHERE status = :statusId
+			ORDER BY id ASC
 			LIMIT ' . $limit;
 
 		$params = [
 			':statusId' => StatusEnum::WAIT->value,
+		];
+
+		$stmt = $this->db->prepare($query);
+		$stmt->execute($params);
+
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	public function getItems(int $limit = 10, DbOrderEnum $orderEnum = DbOrderEnum::ASC): array
+	{
+		$query = 'SELECT * 
+			FROM ' . self::TABLE. ' 
+			ORDER BY id ' . $orderEnum->value . '
+			LIMIT ' . $limit;
+
+		$stmt = $this->db->prepare($query);
+		$stmt->execute();
+
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	public function getItemsById(int $id): array
+	{
+		$query = 'SELECT * 
+			FROM ' . self::TABLE. ' 
+			WHERE id = :id';
+
+		$params = [
+			':id' => $id
 		];
 
 		$stmt = $this->db->prepare($query);
