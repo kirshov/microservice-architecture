@@ -1,5 +1,8 @@
 ## Домашнее задание
 
+Реализованы следующие API:
+
+
 ### Запустить minikube
 minikube start
 
@@ -34,11 +37,40 @@ helm upgrade --install app-billing ./.helm/app-billing
 helm upgrade --install app-notify ./.helm/app-notify
 
 ### Сценарий взаимодействия
-![screen](screenshot/auth-schema.png)
+
+В данной работе используется только http взаимодействие.
+
+При попытке сформировать запрос основной сервис запрашивает баланс в billing-service, если денег а счету достаточно, списывает их.
+В случе успеха или неудачи основной сервис отправляет запрос в notify-service сообщение (текст взависимости от сценария).
+
+![screen](screenshot/order-schema.png)
+
+### В рамках ДЗ реализованы API:
+#### Основной сервис APP:
+
+**[POST]** /api/order/create - создание заказа
+
+#### Сервис биллинга
+**[POST]** /create - Создать счет
+
+**[POST]** /incoming - Добавить средства на баланс
+
+**[POST]** /pay - Списать с баланса
+
+**[GET]** /get - Получить баланс
+
+#### Сервис уведомлений:
+**[POST]** /add - Добавить сообщение в очередь
+
+**[GET]** /all - Получить всех уведомлений
+
+**[GET]** /get - Получить сообщение по ID
+
+**[GET]** /get-last - Получить последнее сообщение
 
 ### Запуск тестов newman
-newman run ./postman/collection.json --folder "test auth"
-![screen](screenshot/lesson-21.png)
+newman run ./postman/collection.json --folder "test billing"
+![screen](screenshot/lesson-22.png)
 
 ### Удалить приложение
 helm upgrade --uninstall app

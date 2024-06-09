@@ -79,6 +79,20 @@ class NotifyRepository
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+
+	public function getLast(): array
+	{
+		$query = 'SELECT * 
+			FROM ' . self::TABLE. '
+			ORDER BY id DESC 
+			LIMIT 1';
+
+		$stmt = $this->db->prepare($query);
+		$stmt->execute();
+
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+
 	public function setDone(int $id): void
 	{
 		$query = 'UPDATE ' . self::TABLE. ' 

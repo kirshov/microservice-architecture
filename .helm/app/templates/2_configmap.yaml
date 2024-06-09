@@ -8,6 +8,8 @@ data:
     APP_ENV={{ .Values.app.env }}
     APP_SECRET={{ .Values.app.secret }}
     DATABASE_URL={{ .Values.app.dbUrl | quote }}
+    BILLING_URL=http://service-billing:80
+    NOTIFY_URL=http://service-notify:80
 
 ---
 

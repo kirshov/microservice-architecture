@@ -100,4 +100,27 @@ $app->get('/get',function (Request $request, Response $response): Response
 	return $response;
 });
 
+
+$app->get('/get-last',function (Request $request, Response $response): Response
+{
+	try {
+		/** @var NotifyRepository $notifyRepository */
+		$notifyRepository = $this->get('notifyRepository');
+
+		$result = [
+			'status' => 'success',
+			'data' => $notifyRepository->getLast(),
+		];
+	} catch (Throwable $throwable) {
+		$result = [
+			'status' => 'error',
+			'error' => $throwable->getMessage(),
+		];
+	}
+
+	$response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE));
+
+	return $response;
+});
+
 $app->run();
