@@ -12,53 +12,19 @@ services:
       - "82:82"
       - "83:83"
     depends_on:
-      - users-service
-      - app-auth
+      - app-users
 
-  users-service:
+  app-users:
     build:
-      context: ./.docker/users-service
-    container_name: users-service
-    volumes:
-      - ./app:/app
-      - ./app/config:/app/config
-      - ./app/var/cache:/app/var/cache
-
-  app-auth:
-    build:
-      context: ./.docker/app-auth
-    container_name: app-auth
+      context: ./.docker/app-users
+    container_name: app-users
     environment:
       POSTGRES_HOST: 'service-postgres'
       POSTGRES_DB: 'arch'
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'postgres_pass'
     volumes:
-      - ./app-auth:/app-auth
-
-  app-billing:
-    build:
-      context: ./.docker/app-billing
-    container_name: app-billing
-    environment:
-      POSTGRES_HOST: 'service-postgres'
-      POSTGRES_DB: 'arch'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres_pass'
-    volumes:
-      - ./app-billing:/app-billing
-
-  app-notify:
-    build:
-      context: ./.docker/app-notify
-    container_name: app-notify
-    environment:
-      POSTGRES_HOST: 'service-postgres'
-      POSTGRES_DB: 'arch'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres_pass'
-    volumes:
-      - ./app-notify:/app-notify
+      - ./app-users:/app-users
 
   service-postgres:
     image: postgres:15-alpine

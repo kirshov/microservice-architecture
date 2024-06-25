@@ -1100,6 +1100,40 @@
 					"response": []
 				},
 				{
+					"name": "check message Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check money\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.data[0].user_id).to.eql(pm.globals.get(\"userId\"));",
+									"    pm.expect(jsonData.data[0].status).to.eql(1);",
+									"    pm.expect(jsonData.data[0].text).to.eql(\"Заказ успешно оплачен\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{notifyUrl}}/get-last",
+							"host": [
+								"{{notifyUrl}}"
+							],
+							"path": [
+								"get-last"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "check money",
 					"event": [
 						{
@@ -1166,6 +1200,638 @@
 							],
 							"path": [
 								"get-last"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "test saga",
+			"item": [
+				{
+					"name": "logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{authUrl}}/logout",
+							"host": [
+								"{{authUrl}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "singin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User has been created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.globals.set(\"userId\", jsonData.id);",
+									"    pm.globals.set(\"userLogin\", jsonData.email);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "client-{{$randomAlphaNumeric}}@mail.local",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "client name",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{authUrl}}/signin",
+							"host": [
+								"{{authUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Login is success', function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.globals.set(\"token\", jsonData.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "{{userLogin}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{authUrl}}/login",
+							"host": [
+								"{{authUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add money",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Money has been added\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{userId}},\n    \"value\": 250\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{billingUrl}}/incoming",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"incoming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Money has been added\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.globals.set(\"productId\", jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-UserId",
+								"value": "1",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Товар\",\n    \"price\": 200,\n    \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{storeUrl}}/create",
+							"host": [
+								"{{storeUrl}}"
+							],
+							"path": [
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "set product quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Money has been added\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-UserId",
+								"value": "1",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{productId}},\n    \"quantity\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{storeUrl}}/update",
+							"host": [
+								"{{storeUrl}}"
+							],
+							"path": [
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check product quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Money has been added\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.quantity).to.eql(10);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-UserId",
+								"value": "1",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Товар\",\n    \"price\": 200,\n    \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{storeUrl}}/?id={{productId}}",
+							"host": [
+								"{{storeUrl}}"
+							],
+							"path": [
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{productId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create success order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Order has been created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"id\": {{productId}},\n            \"name\": \"Товар\",\n            \"quantity\": 1,\n            \"price\": 200\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check product quantity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Money has been added\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.quantity).to.eql(9);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-UserId",
+								"value": "1",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Товар\",\n    \"price\": 200,\n    \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{storeUrl}}/?id={{productId}}",
+							"host": [
+								"{{storeUrl}}"
+							],
+							"path": [
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{productId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check money",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check money\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.balance).to.eql(50);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{billingUrl}}/get",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check success message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.data[0].user_id).to.eql(pm.globals.get(\"userId\"));",
+									"    pm.expect(jsonData.data[0].status).to.eql(1);",
+									"    pm.expect(jsonData.data[0].text).to.includes(\"успешно оплачен!\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{notifyUrl}}/get-last",
+							"host": [
+								"{{notifyUrl}}"
+							],
+							"path": [
+								"get-last"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create failed order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Order has been created\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.error).to.eql(\"Не хватает средств\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"id\": {{productId}},\n            \"name\": \"Товар\",\n            \"quantity\": 1,\n            \"price\": 200\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{orderUrl}}/create",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check logs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check success message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"",
+									"    pm.expect(jsonData[0].user_id).to.eql(pm.globals.get(\"userId\"));",
+									"    pm.expect(jsonData[0].message).to.eql(\"Уведомление failure отправлено\");",
+									"",
+									"    pm.expect(jsonData[1].user_id).to.eql(pm.globals.get(\"userId\"));",
+									"    pm.expect(jsonData[1].message).to.eql(\"Товары сняты с резерва\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{orderUrl}}/logs?userId={{userId}}",
+							"host": [
+								"{{orderUrl}}"
+							],
+							"path": [
+								"logs"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check money",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check money\", function () {",
+									"    var jsonData = pm.response.json();",
+									"",
+									"    pm.expect(jsonData.balance).to.eql(50);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{billingUrl}}/get",
+							"host": [
+								"{{billingUrl}}"
+							],
+							"path": [
+								"get"
 							]
 						}
 					},
@@ -1499,37 +2165,23 @@
 			"type": "string"
 		},
 		{
-			"key": "authUrl",
-			"value": "http://localhost:81",
-			"type": "string",
-			"disabled": true
-		},
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:80",
-			"type": "string",
-			"disabled": true
-		},
-		{
-			"key": "billingUrl",
-			"value": "http://localhost:82",
-			"type": "string",
-			"disabled": true
-		},
-		{
 			"key": "billingUrl",
 			"value": "http://arch.homework/billing",
 			"type": "string"
 		},
 		{
 			"key": "notifyUrl",
-			"value": "http://localhost:83",
-			"type": "string",
-			"disabled": true
+			"value": "http://arch.homework/notify",
+			"type": "string"
 		},
 		{
-			"key": "notifyUrl",
-			"value": "http://arch.homework/notify",
+			"key": "storeUrl",
+			"value": "http://arch.homework/store",
+			"type": "string"
+		},
+		{
+			"key": "orderUrl",
+			"value": "http://arch.homework/orders",
 			"type": "string"
 		}
 	]

@@ -1,9 +1,0 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
-
-metrics:
-  path: /metrics
-  controller: Artprima\PrometheusMetricsBundle\Controller\MetricsController::prometheus
