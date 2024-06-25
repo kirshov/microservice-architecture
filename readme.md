@@ -1,3 +1,4 @@
+Установку упаковал в makefile:
 ## Установить проект
 ### Установить сервисы
 namespace = kirshov-otus (указан в make файле)
@@ -12,5 +13,5 @@ newman run ./postman/collection.json --folder "test saga"
 ![screen](screenshot/result-2.png)
 
 ## Удалить проект
-uninstall-all
+make uninstall-all
 
